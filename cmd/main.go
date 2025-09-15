@@ -1,6 +1,8 @@
 package main
 
 import (
+	"database/sql"
+
 	"github.com/devdiagon/gomerce/cmd/api"
 	"github.com/devdiagon/gomerce/config"
 	"github.com/devdiagon/gomerce/db"
@@ -23,10 +25,20 @@ func main() {
 		log.Fatal(err)
 	}
 
-	server := api.NewAPIServer(":8000", nil)
-	err := server.Run()
+	initStorage(db)
 
+	server := api.NewAPIServer(config.Envs.Port, nil)
+	if err := server.Run(); err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+func initStorage(db *sql.DB) {
+	err := db.Ping()
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	log.Info("Successfully connected to the Database")
 }
