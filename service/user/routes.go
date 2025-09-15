@@ -7,6 +7,7 @@ import (
 	"github.com/devdiagon/gomerce/service/auth"
 	"github.com/devdiagon/gomerce/types"
 	"github.com/devdiagon/gomerce/utils"
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 )
 
@@ -33,6 +34,13 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 	var payload types.RegisterUserPayload
 	if err := utils.ParseJSON(r, &payload); err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	//Validate the data sent
+	if err := utils.Validate.Struct(payload); err != nil {
+		errors := err.(validator.ValidationErrors)
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", errors))
 		return
 	}
 
