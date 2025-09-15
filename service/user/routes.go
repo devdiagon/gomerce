@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/devdiagon/gomerce/service/auth"
 	"github.com/devdiagon/gomerce/types"
 	"github.com/devdiagon/gomerce/utils"
 	"github.com/gorilla/mux"
@@ -42,12 +43,19 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//Hash the password
+	hasedPassword, err := auth.HashPassword(payload.Password)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
 	//Create a new user
 	err = h.store.CreateUser(types.User{
 		FirstName: payload.FirstName,
 		LastName:  payload.LastName,
 		Email:     payload.Email,
-		Password:  payload.Password,
+		Password:  hasedPassword,
 	})
 
 	if err != nil {
