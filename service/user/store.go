@@ -39,6 +39,13 @@ func (s *Store) GetUserByEmail(email string) (*types.User, error) {
 	return user, nil
 }
 
+func (s *Store) GetUserById(id int) (*types.User, error) {
+	return nil, nil
+}
+func (s *Store) CreateUser(types.User) error {
+	return nil
+}
+
 func scanRowIntoUser(rows *sql.Rows) (*types.User, error) {
 	user := new(types.User)
 
