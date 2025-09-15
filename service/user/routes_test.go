@@ -25,7 +25,7 @@ func TestUserServiceHandlers(t *testing.T) {
 		payload := types.RegisterUserPayload{
 			FirstName: "test1",
 			LastName:  "test1",
-			Email:     "",
+			Email:     "invalid",
 			Password:  "ABC123",
 		}
 		marshaled, _ := json.Marshal(payload)
@@ -47,7 +47,35 @@ func TestUserServiceHandlers(t *testing.T) {
 		if res.Code != http.StatusBadRequest {
 			t.Errorf("expected status code: %d, got: %d", http.StatusBadRequest, res.Code)
 		}
+	})
 
+	t.Run("should register the user", func(t *testing.T) {
+		//Create a dummy payload
+		payload := types.RegisterUserPayload{
+			FirstName: "test1",
+			LastName:  "test1",
+			Email:     "valid@mail.com",
+			Password:  "ABC123",
+		}
+		marshaled, _ := json.Marshal(payload)
+
+		//Send the payload as a http request
+		req, err := http.NewRequest(http.MethodPost, "/register", bytes.NewBuffer(marshaled))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		//Send the request to de "/register" route to obtain a response
+		res := httptest.NewRecorder()
+		router := mux.NewRouter()
+
+		router.HandleFunc("/register", handler.handleRegister)
+		router.ServeHTTP(res, req)
+
+		//Test the result
+		if res.Code != http.StatusCreated {
+			t.Errorf("expected status code: %d, got: %d", http.StatusBadRequest, res.Code)
+		}
 	})
 }
 
