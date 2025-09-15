@@ -30,7 +30,8 @@ func (s *APIServer) Run() error {
 	userService := user.NewHandler(userStore)
 	userService.RegisterRoutes(subrouter)
 
-	log.Info("Server running on: ", s.address)
+	log.Info("Server running on port ", s.address)
 
+	//Send the port as ":<port>" string
 	return http.ListenAndServe(s.address, router)
 }
