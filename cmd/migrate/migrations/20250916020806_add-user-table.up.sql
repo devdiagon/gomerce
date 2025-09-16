@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
   `first_name` VARCHAR(255) NOT NULL,
   `last_name` VARCHAR(255) NOT NULL,
   `email` VARCHAR(120) NOT NULL,
-  `password` VARCHAR(50) NOT NULL,
+  `password` VARCHAR(120) NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
   PRIMARY KEY (id),
