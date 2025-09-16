@@ -40,9 +40,36 @@ func (s *Store) GetUserByEmail(email string) (*types.User, error) {
 }
 
 func (s *Store) GetUserById(id int) (*types.User, error) {
-	return nil, nil
+	rows, err := s.db.Query("SELECT * FROM users WHERE id = ?", id)
+	if err != nil {
+		return nil, err
+	}
+
+	user := new(types.User)
+
+	for rows.Next() {
+		user, err = scanRowIntoUser(rows)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	//User not Found
+	if user.ID == 0 {
+		return nil, fmt.Errorf("user not found")
+	}
+
+	return user, nil
 }
-func (s *Store) CreateUser(types.User) error {
+
+func (s *Store) CreateUser(user types.User) error {
+	//At this point the passowrd sent to this function is already hashed
+	_, err := s.db.Exec("INSERT INTO users (first_name, last_name, email, password) VALUES (?,?,?,?)", user.FirstName, user.LastName, user.Email, user.Password)
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
