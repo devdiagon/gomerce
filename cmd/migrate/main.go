@@ -48,13 +48,13 @@ func main() {
 		if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 			log.Fatal(err)
 		}
-		log.Info("users table migration successfully imported")
+		log.Info("table database migration successfully done")
 	}
 
 	if cmd == "down" {
 		if err := m.Down(); err != nil && err != migrate.ErrNoChange {
 			log.Fatal(err)
 		}
-		log.Info("users table migration successfully down")
+		log.Info("tables successfully dropped from database")
 	}
 }
