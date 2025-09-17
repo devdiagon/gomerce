@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"net/http"
 
+	"github.com/devdiagon/gomerce/service/cart"
+	"github.com/devdiagon/gomerce/service/order"
 	"github.com/devdiagon/gomerce/service/product"
 	"github.com/devdiagon/gomerce/service/user"
 	"github.com/gorilla/mux"
@@ -35,6 +37,11 @@ func (s *APIServer) Run() error {
 	productStore := product.NewStore(s.db)
 	productService := product.NewHandler(productStore)
 	productService.RegisterRoutes(subrouter)
+
+	orderStore := order.NewStore(s.db)
+
+	cartService := cart.NewHandler(orderStore, productStore, userStore)
+	cartService.RegisterRoutes(subrouter)
 
 	log.Info("Server running on port ", s.address)
 
