@@ -2,6 +2,8 @@ package product
 
 import (
 	"database/sql"
+	"fmt"
+	"strings"
 
 	"github.com/devdiagon/gomerce/types"
 )
@@ -56,6 +58,45 @@ func scanRowsIntoProduct(rows *sql.Rows) (*types.Product, error) {
 
 func (s *Store) CreateProduct(product types.Product) error {
 	_, err := s.db.Exec("INSERT INTO products (name, description, image, price, quantity) VALUES (?,?,?,?,?)", product.Name, product.Description, product.Image, product.Price, product.Quantity)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Store) GetProductsByIds(productIds []int) ([]types.Product, error) {
+	placeHolders := strings.Repeat(",?", len(productIds)-1)
+	query := fmt.Sprintf("SELECT * FROM products WHERE id IN (?%s)", placeHolders)
+
+	//Convert productIds to []interface{}
+	args := make([]interface{}, len(productIds))
+	for i, v := range productIds {
+		args[i] = v
+	}
+
+	rows, err := s.db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	products := []types.Product{}
+
+	for rows.Next() {
+		prod, err := scanRowsIntoProduct(rows)
+		if err != nil {
+			return nil, err
+		}
+
+		products = append(products, *prod)
+	}
+
+	return products, nil
+}
+
+func (s *Store) UpdateProduct(product types.Product) error {
+	_, err := s.db.Exec("UPDATE products SET name = ?, price = ?, image = ?, description = ?, quantity = ? WHERE id = ?", product.Name, product.Price, product.Image, product.Description, product.Quantity, product.ID)
 
 	if err != nil {
 		return err
